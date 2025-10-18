@@ -136,11 +136,20 @@ Troubleshooting
 - If Node integration test fails:
 	- Ensure backend is running first.
 	- Run `npm install` inside the `integration` folder, not at repo root.
-- If you need reproducible Maven builds in CI, consider adding the Maven Wrapper (`mvnw`) to the repo.
+If you need reproducible Maven builds in CI, consider adding the Maven Wrapper (`mvnw`) to the repo.
+
+Maven Wrapper note
+------------------
+I added `mvnw`, `mvnw.cmd` and `.mvn/wrapper/maven-wrapper.properties` to the repo. The actual
+binary `maven-wrapper.jar` is not included. To generate it locally (and commit it) run:
+
+```powershell
+mvn -N io.takari:maven:wrapper
+```
+
+That will populate `.mvn/wrapper/maven-wrapper.jar`. Committing the jar makes CI and Render
+builds reproducible without preinstalled Maven.
 
 Next steps (optional improvements)
-- Add Playwright E2E tests that drive the real browser UI and assert realtime behavior.
-- Add per-row instrument selectors and envelopes for richer sound.
-- Add persistent pattern storage and UI for saving/loading patterns via `/api/beats`.
 
 If you want any of the above, tell me which and I will implement it.
