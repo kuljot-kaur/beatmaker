@@ -1,0 +1,10 @@
+target/
+node_modules/
+*.log
+*.tmp
+.DS_Store
+.git
+.idea
+.vscode
+integration/node_modules
+integration/npm-debug.log

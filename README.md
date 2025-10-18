@@ -112,6 +112,23 @@ Notes about the Dockerfile
 - The default Spring Boot port 8080 is exposed.
 - The `HEALTHCHECK` uses the actuator health endpoint — if your app doesn't enable actuator, the healthcheck may fail; remove or adjust it in the Dockerfile.
 
+Render / PaaS Docker notes
+--------------------------------
+- Render and many PaaS providers set a dynamic `PORT` environment variable for your service. The provided Dockerfile respects the `PORT` env var at runtime and passes it to Spring Boot (`-Dserver.port=${PORT}`).
+- To deploy on Render using a Docker image:
+   1. Create a new "Web Service" on Render and select the Docker deployment option.
+ 2. Set the build context to the repository root and the Dockerfile path to `java/com/beatmaker/Dockerfile`.
+ 3. Ensure the service has the environment variable `PORT` (Render sets this for you automatically).
+ 4. If you want more memory for the JVM, add `JAVA_OPTS` env var (for example `-Xms256m -Xmx1g`).
+
+Example Render settings:
+
+   - Build Command: (leave default; Dockerfile builds the app)
+   - Start Command: (leave empty; Dockerfile ENTRYPOINT handles startup)
+   - Environment: leave `PORT` blank (Render will populate it)
+
+If you prefer Render's native build (no Docker), you can set up a `render.yaml` file — tell me if you want that and I will add it.
+
 Troubleshooting
 - If the frontend can't connect to WebSocket:
 	- Ensure backend is running and reachable on port 8080.
