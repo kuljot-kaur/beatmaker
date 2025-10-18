@@ -1,0 +1,12 @@
+{
+  "name": "collabmusic-integration",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "test-stomp": "node test-stomp.js"
+  },
+  "dependencies": {
+    "@stomp/stompjs": "^7.0.0",
+    "sockjs-client": "^1.6.1"
+  }
+}

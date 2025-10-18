@@ -1,0 +1,129 @@
+# collabmusic
+
+This repository contains a small collaborative beat maker app: a Spring Boot backend and a simple frontend served from the backend's static resources. The frontend uses SockJS + STOMP to send/receive beat patterns in realtime.
+
+This README merges the frontend instructions and integration notes and adds Docker support.
+
+Requirements
+- Java 17+ (JDK) to build the backend
+- Maven (or use the provided Dockerfile)
+- Node.js + npm (for the optional STOMP integration test)
+
+Quick start - build & run locally
+
+1. Build and run tests:
+
+```powershell
+cd D:\vscode\colabmusic\collabmusic
+mvn test
+```
+
+2. Run the app locally:
+
+```powershell
+cd D:\vscode\colabmusic\collabmusic
+mvn spring-boot:run
+```
+
+3. Open the frontend in a browser:
+
+- http://localhost:8080
+- Open two tabs to test realtime updates between clients.
+
+Frontend testing and integration
+
+Manual frontend (browser) test
+
+1. Start the backend:
+
+```powershell
+cd d:\vscode\colabmusic\collabmusic
+mvn spring-boot:run
+```
+
+2. Open a browser and navigate to:
+
+   http://localhost:8080
+
+   - Click grid cells to toggle beats, and click Play to hear a click tone.
+   - Open Developer Tools (F12) → Network / WebSockets to inspect frames.
+
+3. Verify websocket
+
+   - The frontend connects to `/ws` via SockJS then STOMP.
+   - It subscribes to `/topic/beats` and sends to `/app/beat`.
+
+Automated STOMP integration test (Node)
+
+Prerequisites:
+
+- Node.js installed (v14+ recommended)
+
+Steps:
+
+```powershell
+cd d:\vscode\colabmusic\collabmusic\integration
+npm install
+npm run test-stomp
+```
+
+What it does:
+
+- Connects to `http://localhost:8080/ws` using SockJS + STOMP.
+- Subscribes to `/topic/beats` and publishes a small test payload to `/app/beat`.
+- Passes if a message is received on `/topic/beats` within 3s.
+
+If the test fails:
+
+- Ensure the backend is running on port 8080.
+- Check CORS/allowed origins (the server currently sets allowed origins to `*` for SockJS).
+
+Automated STOMP integration test (optional)
+
+Prerequisites: Node 14+ installed
+
+```powershell
+cd D:\vscode\colabmusic\collabmusic\integration
+npm install
+npm run test-stomp
+```
+
+This connects to the running backend at `http://localhost:8080/ws`, publishes a small test pattern, and verifies a message is received on `/topic/beats`.
+
+Docker
+
+I added a multi-stage Dockerfile that builds the Spring Boot app with Maven and packages it into a lightweight JVM image.
+
+Build the image (from repo root where `pom.xml` is located):
+
+```powershell
+cd D:\vscode\colabmusic\collabmusic
+docker build -f java/com/beatmaker/Dockerfile -t collabmusic:latest .
+```
+
+Run the container:
+
+```powershell
+docker run --rm -p 8080:8080 --name collabmusic collabmusic:latest
+```
+
+Notes about the Dockerfile
+- It uses Maven (Eclipse Temurin 17) in the build stage to create the fat jar and a JRE image to run the jar.
+- The default Spring Boot port 8080 is exposed.
+- The `HEALTHCHECK` uses the actuator health endpoint — if your app doesn't enable actuator, the healthcheck may fail; remove or adjust it in the Dockerfile.
+
+Troubleshooting
+- If the frontend can't connect to WebSocket:
+	- Ensure backend is running and reachable on port 8080.
+	- Check server logs (mvn spring-boot:run output) for websocket exceptions.
+- If Node integration test fails:
+	- Ensure backend is running first.
+	- Run `npm install` inside the `integration` folder, not at repo root.
+- If you need reproducible Maven builds in CI, consider adding the Maven Wrapper (`mvnw`) to the repo.
+
+Next steps (optional improvements)
+- Add Playwright E2E tests that drive the real browser UI and assert realtime behavior.
+- Add per-row instrument selectors and envelopes for richer sound.
+- Add persistent pattern storage and UI for saving/loading patterns via `/api/beats`.
+
+If you want any of the above, tell me which and I will implement it.

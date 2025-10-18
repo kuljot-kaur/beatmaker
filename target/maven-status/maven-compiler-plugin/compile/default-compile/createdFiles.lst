@@ -1,0 +1,7 @@
+com\beatmaker\config\WebSocketConfig.class
+com\beatmaker\model\Beat.class
+com\beatmaker\repository\BeatRepository.class
+com\beatmaker\CollaborativeBeatMakerApplication.class
+com\beatmaker\controller\WebSocketController.class
+com\beatmaker\controller\BeatController.class
+com\beatmaker\service\BeatService.class
